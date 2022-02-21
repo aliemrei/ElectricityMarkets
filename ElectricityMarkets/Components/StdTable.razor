@@ -37,7 +37,7 @@
 
                   @foreach (ElectricityMarkets.Model.StdTableColumnModel item in CurrentData.Columns)
                   {
-                      <td><input class="form-control" @bind="item.Filter.Value" @onblur="FilterChanged" /></td>
+                      <td><input class="form-control" placeholder="@(item.DataType == "nvarchar" ? "%abc%" : (item.DataType == "datetime" ? "30.12.2020" : ""))" @bind="item.Filter.Value" @onblur="FilterChanged" /></td>
                   }
                 </tr>
             }
