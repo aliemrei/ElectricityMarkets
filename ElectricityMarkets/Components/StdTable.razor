@@ -1,90 +1,88 @@
-﻿@page "/StdTable" 
- 
-<div class="container-fluid overflow-auto">
-<table class="table table-striped" style="width:100%">
-  <thead>
-    <tr>
-        <td colspan="@(CurrentData.Columns.Count + 1)">
-            <div class="mb-3">
-              <label for="table-pager-combo" class="form-label">Page Size</label>
-              <select @bind="PageCount" id="table-pager-combo" class="form-control" >
-                  <option value="5">5</option>
-                  <option value="10">10</option>
-                  <option value="20">20</option>
-                  <option value="50">50</option>
-                  <option value="100">100</option>
-              </select> 
-            </div>
-        </td>
-    </tr>
-    <tr>
-      <th scope="col">#</th>
-       @{
-           foreach (ElectricityMarkets.Model.StdTableColumnModel item in CurrentData.Columns)
-           {
-               <th scope="col">@item.Name</th>
-           }
-       }
-    </tr>
-  </thead>
-  <tbody>
-        @{
-            var rowIndex = PageIndex - PageCount;
-            if (ShowFilter)
-            {
+﻿<div>
+    <div class="row">
+        <div class="col-md-2 col-sm-12">
+            <label for="table-pager-combo" class="form-label">Page Size</label>
+            <select @bind="PageCount" id="table-pager-combo" class="form-control">
+                <option value="5">5</option>
+                <option value="10">10</option>
+                <option value="20">20</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+            </select>
+        </div>
+    </div>
+    <div class="container-fluid overflow-auto">
+
+        <table class="table table-striped" style="width:100%">
+            <thead>
+
                 <tr>
-                  <th scope="row"><i class="fa fa-filter" aria-hidden="true"></i></th>
-
-                  @foreach (ElectricityMarkets.Model.StdTableColumnModel item in CurrentData.Columns)
-                  {
-                      <td><input class="form-control" placeholder="@(item.DataType == "nvarchar" ? "%abc%" : (item.DataType == "datetime" ? "30.12.2020" : ""))" @bind="item.Filter.Value" @onblur="FilterChanged" /></td>
-                  }
+                    <th scope="col">#</th>
+                    @{
+                        foreach (ElectricityMarkets.Model.StdTableColumnModel item in CurrentData.Columns)
+                        {
+                            <th scope="col">@item.Name</th>
+                        }
+                    }
                 </tr>
-            }
-        }
-      @foreach (var row in CurrentData.Data)
-      {
-        rowIndex++;
+            </thead>
+            <tbody>
+                @{
+                    var rowIndex = PageIndex - PageCount;
+                    if (ShowFilter)
+                    {
+                        <tr>
+                            <th scope="row"><i class="fa fa-filter" aria-hidden="true"></i></th>
 
-        <tr>
-            <th scope="row">@rowIndex</th>
-          @foreach (ElectricityMarkets.Model.StdTableColumnModel item in CurrentData.Columns)
-            {
-                var value = row[item.Name].ToString();
-
-                var cssClass = "";
-
-                if (item.DataType == "datetime")
-                {
-                    value = ((DateTime)row[item.Name]).ToShortDateString();
-
-                    cssClass = "text-center";
+                            @foreach (ElectricityMarkets.Model.StdTableColumnModel item in CurrentData.Columns)
+                            {
+                                <td><input class="form-control" placeholder="@(item.DataType == "nvarchar" ? "%abc%" : (item.DataType == "datetime" ? "30.12.2020" : ""))" @bind="item.Filter.Value" @onblur="FilterChanged" /></td>
+                            }
+                        </tr>
+                    }
                 }
-                else if (item.DataType == "float")
+                @foreach (var row in CurrentData.Data)
                 {
-                    value = ((float)row[item.Name]).ToString("#,##0.00");
+                    rowIndex++;
 
-                    cssClass = "text-end";
+                    <tr>
+                        <th scope="row">@rowIndex</th>
+                        @foreach (ElectricityMarkets.Model.StdTableColumnModel item in CurrentData.Columns)
+                        {
+                            var value = row[item.Name].ToString();
+
+                            var cssClass = "";
+
+                            if (item.DataType == "datetime")
+                            {
+                                value = ((DateTime)row[item.Name]).ToShortDateString();
+
+                                cssClass = "text-center";
+                            }
+                            else if (item.DataType == "float")
+                            {
+                                value = ((float)row[item.Name]).ToString("#,##0.00");
+
+                                cssClass = "text-end";
+                            }
+
+                            <td class="@cssClass">@value</td>
+                        }
+                    </tr>
                 }
-                 
-                <td class="@cssClass">@value</td>
-            }
-        </tr>
-      }
-      <tr>
-            <td colspan="@(CurrentData.Columns.Count + 1)">
-                <nav aria-label="Page navigation example">
-                  <ul class="pagination">
-                    <li @onclick="PreviousPage" class="page-item"><a class="page-link" href="#">Previous</a></li>
-                    <li @onclick="@(e => SetPage(1))" class="page-item"><a class="page-link" href="#">1</a></li>
-                    <li @onclick="@(e => SetPage(2))" class="page-item"><a class="page-link" href="#">2</a></li>
-                    <li @onclick="@(e => SetPage(3))" class="page-item"><a class="page-link" href="#">3</a></li>
-                    <li @onclick="NextPage" class="page-item"><a class="page-link" href="#">Next</a></li>
-                  </ul>
-                </nav>
-            </td>
-        </tr>
-  </tbody>
-</table>
+
+            </tbody>
+        </table>
+    </div>
+    <div class="row">
+        <nav aria-label="Page navigation example">
+            <ul class="pagination">
+                <li @onclick="PreviousPage" class="page-item"><a class="page-link" href="#">Previous</a></li>
+                <li @onclick="@(e => SetPage(1))" class="page-item"><a class="page-link" href="#">1</a></li>
+                <li @onclick="@(e => SetPage(2))" class="page-item"><a class="page-link" href="#">2</a></li>
+                <li @onclick="@(e => SetPage(3))" class="page-item"><a class="page-link" href="#">3</a></li>
+                <li @onclick="NextPage" class="page-item"><a class="page-link" href="#">Next</a></li>
+            </ul>
+        </nav>
+    </div>
 </div>
- 
