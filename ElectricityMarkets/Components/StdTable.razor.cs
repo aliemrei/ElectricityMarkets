@@ -64,7 +64,7 @@ namespace ElectricityMarkets.Components
             LoadData(); 
         }
 
-        private void LoadData()
+        private async void LoadData()
         {
             List<FilterModel> parameters = null;
 
@@ -73,7 +73,7 @@ namespace ElectricityMarkets.Components
                                    .Select(x => new FilterModel { FieldName = x.Name, FieldType = x.DataType, Operator = x.FilterOperator, Value = x.Filter.Value }).ToList();
 
 
-            var q = DBHelper.GetData(TableName, PageCount, CurrentPage, OrderBy, parameters);
+            var q = await DBHelper.GetData(TableName, PageCount, CurrentPage, OrderBy, parameters);
 
             if (CurrentData == null)
                 CurrentData = q.ToObject<StdTableDataModel>();

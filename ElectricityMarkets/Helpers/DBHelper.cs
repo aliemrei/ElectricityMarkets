@@ -90,7 +90,7 @@ namespace ElectricityMarkets.Helpers
             return result;
         }
 
-        public static JArray ExecuteSql(string Sql, List<SqlParameter> parameters = null)
+        public static async Task<JArray> ExecuteSql(string Sql, List<SqlParameter> parameters = null)
         {
             using(SqlConnection cnn = new SqlConnection(ConnectionString().ConnectionString))
             {
@@ -101,7 +101,7 @@ namespace ElectricityMarkets.Helpers
                     if (parameters != null)
                         cmd.Parameters.AddRange(parameters.ToArray());
 
-                    var rd = cmd.ExecuteReader();
+                    var rd = await cmd.ExecuteReaderAsync();
 
                     string json = JsonConvert.SerializeObject(Serialize(rd), Formatting.Indented);
 
@@ -114,7 +114,7 @@ namespace ElectricityMarkets.Helpers
             }
         }
 
-        public static JObject GetData(string TableName, int PageCount, int PageIndex, string OrderBy, List<FilterModel> parameters = null)
+        public static async Task<JObject> GetData(string TableName, int PageCount, int PageIndex, string OrderBy, List<FilterModel> parameters = null)
         {
             var result = new JObject();
 
@@ -138,10 +138,10 @@ namespace ElectricityMarkets.Helpers
                 }
             }
 
-            result["Columns"] = ExecuteSql($"select type_name(c.system_type_id) DataType, c.[name] Name from sys.all_columns c where c.object_id = object_id('{TableName}')");
+            result["Columns"] = await ExecuteSql($"select type_name(c.system_type_id) DataType, c.[name] Name from sys.all_columns c where c.object_id = object_id('{TableName}')");
 
 
-            result["Data"] = ExecuteSql($"SELECT * FROM {TableName} {Filter} ORDER BY {OrderBy} OFFSET {PageIndex} ROWS FETCH NEXT {PageCount} ROWS ONLY; ", sqlParameters);
+            result["Data"] = await ExecuteSql($"SELECT * FROM {TableName} {Filter} ORDER BY {OrderBy} OFFSET {PageIndex} ROWS FETCH NEXT {PageCount} ROWS ONLY; ", sqlParameters);
 
             return result;
         }
