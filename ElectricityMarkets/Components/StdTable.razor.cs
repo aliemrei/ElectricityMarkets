@@ -24,7 +24,7 @@ namespace ElectricityMarkets.Components
                 currentPage = value;
 
                 if (initialized)
-                    LoadData();
+                    LoadDataAsync();
             }
         }
 
@@ -36,7 +36,7 @@ namespace ElectricityMarkets.Components
                 pageCount = value;
 
                 if (initialized)
-                    LoadData();
+                    LoadDataAsync();
             } 
         }
 
@@ -61,10 +61,10 @@ namespace ElectricityMarkets.Components
 
             this.initialized = true;
 
-            LoadData(); 
+            LoadDataAsync(); 
         }
 
-        private async void LoadData()
+        private async void LoadDataAsync()
         {
             List<FilterModel> parameters = null;
 
@@ -73,7 +73,7 @@ namespace ElectricityMarkets.Components
                                    .Select(x => new FilterModel { FieldName = x.Name, FieldType = x.DataType, Operator = x.FilterOperator, Value = x.Filter.Value }).ToList();
 
 
-            var q = await DBHelper.GetData(TableName, PageCount, CurrentPage, OrderBy, parameters);
+            var q = await DBHelper.GetDataAsync(TableName, PageCount, CurrentPage, OrderBy, parameters);
 
             if (CurrentData == null)
                 CurrentData = q.ToObject<StdTableDataModel>();
@@ -102,7 +102,7 @@ namespace ElectricityMarkets.Components
         public void FilterChanged()
         {
             if (initialized)
-                LoadData();
+                LoadDataAsync();
         }
     }
 }
