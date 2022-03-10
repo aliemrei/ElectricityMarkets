@@ -90,7 +90,7 @@ namespace ElectricityMarkets.Helpers
             return result;
         }
 
-        public static async Task<JArray> ExecuteSqlAsync(string Sql, List<SqlParameter> parameters = null)
+        public static async ValueTask<JArray> ExecuteSqlAsync(string Sql, List<SqlParameter> parameters = null)
         {
             using(SqlConnection cnn = new SqlConnection(ConnectionString().ConnectionString))
             {
@@ -114,7 +114,7 @@ namespace ElectricityMarkets.Helpers
             }
         }
 
-        public static async Task<JObject> GetDataAsync(string TableName, int PageCount, int PageIndex, string OrderBy, List<FilterModel> parameters = null)
+        public static async ValueTask<JObject> GetDataAsync(string TableName, int PageCount, int PageIndex, string OrderBy, List<FilterModel> parameters = null)
         {
             var result = new JObject();
 

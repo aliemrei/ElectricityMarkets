@@ -64,7 +64,7 @@ namespace ElectricityMarkets.Components
             LoadDataAsync(); 
         }
 
-        private async void LoadDataAsync()
+        private async ValueTask LoadDataAsync()
         {
             List<FilterModel> parameters = null;
 

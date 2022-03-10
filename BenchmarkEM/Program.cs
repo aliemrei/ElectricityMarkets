@@ -32,7 +32,7 @@ namespace BenchmarkEM
         }
 
         [Benchmark]
-        public async Task RunValueTask()
+        public async ValueTask RunValueTask()
         {
             for (int i = 0; i < 5; i++)
             {
