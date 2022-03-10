@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.32126.317
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ElectricityMarkets", "ElectricityMarkets\ElectricityMarkets.csproj", "{B30AEF6D-7348-44E9-9BF3-B40DC27096BD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ElectricityMarkets", "ElectricityMarkets\ElectricityMarkets.csproj", "{B30AEF6D-7348-44E9-9BF3-B40DC27096BD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BenchmarkEM", "BenchmarkEM\BenchmarkEM.csproj", "{AD660381-A165-4A4A-B345-27FC2A3E6361}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{B30AEF6D-7348-44E9-9BF3-B40DC27096BD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B30AEF6D-7348-44E9-9BF3-B40DC27096BD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B30AEF6D-7348-44E9-9BF3-B40DC27096BD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AD660381-A165-4A4A-B345-27FC2A3E6361}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AD660381-A165-4A4A-B345-27FC2A3E6361}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AD660381-A165-4A4A-B345-27FC2A3E6361}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AD660381-A165-4A4A-B345-27FC2A3E6361}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

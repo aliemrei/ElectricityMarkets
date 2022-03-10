@@ -5,13 +5,14 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Threading.Tasks;
 
-namespace ElectricityMarkets.Helpers
+namespace BenchmarkEM
 {
     public static class DBHelper
     {
         private static Dictionary<string, SqlDbType> typeMap;
-        public static IConfiguration configuration;
+   
 
         static DBHelper()
         {
@@ -48,13 +49,13 @@ namespace ElectricityMarkets.Helpers
         {
             var conStr = new Microsoft.Data.SqlClient.SqlConnectionStringBuilder();
 
-            conStr.UserID = configuration.GetSection("DbConfig")["user"];
+            conStr.UserID = "sa";
 
-            conStr.Password = configuration.GetSection("DbConfig")["password"];
+            conStr.Password = "password";
 
-            conStr.InitialCatalog = configuration.GetSection("DbConfig")["database"];
+            conStr.InitialCatalog = "ElectricityMarket";
 
-            conStr.DataSource = configuration.GetSection("DbConfig")["host"] + "," + configuration.GetSection("DbConfig")["port"];
+            conStr.DataSource = "(local)";
 
             conStr.ConnectTimeout = 3000;
 
@@ -90,9 +91,33 @@ namespace ElectricityMarkets.Helpers
             return result;
         }
 
-        public static async Task<JArray> ExecuteSql(string Sql, List<SqlParameter> parameters = null)
+        public static async ValueTask<JArray> ExecuteValueTaskSql(string Sql, List<SqlParameter> parameters = null)
         {
-            using(SqlConnection cnn = new SqlConnection(ConnectionString().ConnectionString))
+            using (SqlConnection cnn = new SqlConnection(ConnectionString().ConnectionString))
+            {
+                using (SqlCommand cmd = new SqlCommand(Sql, cnn))
+                {
+                    cnn.Open();
+
+                    if (parameters != null)
+                        cmd.Parameters.AddRange(parameters.ToArray());
+
+                    var rd = cmd.ExecuteReader();
+
+                    string json = JsonConvert.SerializeObject(Serialize(rd), Formatting.Indented);
+
+                    rd.Close();
+
+                    cnn.Close();
+
+                    return JArray.Parse(json);
+                }
+            }
+        }
+
+        public static async ValueTask<JArray> ExecuteSql(string Sql, List<SqlParameter> parameters = null)
+        {
+            using (SqlConnection cnn = new SqlConnection(ConnectionString().ConnectionString))
             {
                 using (SqlCommand cmd = new SqlCommand(Sql, cnn))
                 {
@@ -126,12 +151,13 @@ namespace ElectricityMarkets.Helpers
             {
                 sqlParameters = new List<SqlParameter>();
 
-                Filter = " WHERE " + string.Join(" AND ", parameters.Select(x => $"[{x.FieldName}] {x.Operator} @{x.FieldName.Replace(" ", "").Replace("/", "")}"  ).ToArray());
+                Filter = " WHERE " + string.Join(" AND ", parameters.Select(x => $"[{x.FieldName}] {x.Operator} @{x.FieldName.Replace(" ", "").Replace("/", "")}").ToArray());
 
                 foreach (var item in parameters)
                 {
-                    var sqlParam = new SqlParameter(item.FieldName.Replace(" ","").Replace("/", ""), GetDbType(item.FieldType)) { 
-                        Value = (item.Value != null ? item.Value : DBNull.Value) 
+                    var sqlParam = new SqlParameter(item.FieldName.Replace(" ", "").Replace("/", ""), GetDbType(item.FieldType))
+                    {
+                        Value = (item.Value != null ? item.Value : DBNull.Value)
                     };
 
                     sqlParameters.Add(sqlParam);
@@ -142,6 +168,39 @@ namespace ElectricityMarkets.Helpers
 
 
             result["Data"] = await ExecuteSql($"SELECT * FROM {TableName} {Filter} ORDER BY {OrderBy} OFFSET {PageIndex} ROWS FETCH NEXT {PageCount} ROWS ONLY; ", sqlParameters);
+
+            return result;
+        }
+
+        public static async ValueTask<JObject> GetValueTaskData(string TableName, int PageCount, int PageIndex, string OrderBy, List<FilterModel> parameters = null)
+        {
+            var result = new JObject();
+
+            string Filter = "";
+
+            List<SqlParameter> sqlParameters = null;
+
+            if (parameters != null && parameters.Count > 0)
+            {
+                sqlParameters = new List<SqlParameter>();
+
+                Filter = " WHERE " + string.Join(" AND ", parameters.Select(x => $"[{x.FieldName}] {x.Operator} @{x.FieldName.Replace(" ", "").Replace("/", "")}").ToArray());
+
+                foreach (var item in parameters)
+                {
+                    var sqlParam = new SqlParameter(item.FieldName.Replace(" ", "").Replace("/", ""), GetDbType(item.FieldType))
+                    {
+                        Value = (item.Value != null ? item.Value : DBNull.Value)
+                    };
+
+                    sqlParameters.Add(sqlParam);
+                }
+            }
+
+            result["Columns"] = await ExecuteValueTaskSql($"select type_name(c.system_type_id) DataType, c.[name] Name from sys.all_columns c where c.object_id = object_id('{TableName}')");
+
+
+            result["Data"] = await ExecuteValueTaskSql($"SELECT * FROM {TableName} {Filter} ORDER BY {OrderBy} OFFSET {PageIndex} ROWS FETCH NEXT {PageCount} ROWS ONLY; ", sqlParameters);
 
             return result;
         }
